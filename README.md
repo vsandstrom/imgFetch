@@ -8,7 +8,19 @@ It exports the register with the new image links to a new .csv file.
 
 The input file should be located in the same directory as imgFetch.py
 
-usage:
+
+<br>
+
+Before running imgFetch.py, run:
+> $ pip install -r requirements.txt
+
+to install all dependencies
+
+<br>
+
+To run main program, run:
 > $ python <input_csv_file> (opt: <output_csv_file>)
+
+
 
 If no third argument, a name for the output file, is given, it will use the input filename but append '_export' to name. 
