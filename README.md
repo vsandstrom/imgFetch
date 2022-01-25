@@ -12,14 +12,18 @@ The input file should be located in the same directory as imgFetch.py
 <br>
 
 Before running imgFetch.py, run:
-> $ pip install -r requirements.txt
+```bash
+$ pip install -r requirements.txt
+```
 
 to install all dependencies
 
 <br>
 
 To run main program, run:
-> $ python <input_csv_file> (opt: <output_csv_file>)
+```bash
+$ python <input_csv_file> (opt: <output_csv_file>)
+```
 
 
 
