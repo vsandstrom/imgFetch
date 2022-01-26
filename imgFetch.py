@@ -17,8 +17,8 @@ from bs4 import BeautifulSoup
 
 def imgFetcher(IN, OUT):
     """
-    Opens a .csv file, where column 3 contains ARTIST and ALBUM data, formats a http-request to Discogs searching for
-    record, parses HTML response and filters it to get an image link to the record. The link is inserted in the right place and the entire file is exported again as a .csv file
+    Opens a csv with specific data, uses data to format a HTTP request.
+    Fetches img links from "Discogs" and exports as csv.
     """
 
     ITEMCOLUMN = 2
@@ -28,7 +28,7 @@ def imgFetcher(IN, OUT):
     postCount = 0
     totalCount = 0
     procent = 0
-    
+
     # Tries to open a database file in .csv format
     try:
         with open(IN, 'r') as file:
@@ -42,7 +42,7 @@ def imgFetcher(IN, OUT):
                     preCount += 1
 
         procent = 100 / totalCount
-        print(f'Before image-fetching: { procent * preCount }')
+        print(f'Before image-fetching: { procent * preCount } %')
 
     except FileNotFoundError:
         msg = f'ERROR: File <{IN}> not recognized'
@@ -70,7 +70,7 @@ def imgFetcher(IN, OUT):
                         else:
                             pass
 
-                        # Parsing HTML 
+                        # Parsing HTML
                         soup = BeautifulSoup(r, "html5lib")
 
                         span = soup.find('span', {'class': 'thumbnail_center'})
@@ -88,11 +88,10 @@ def imgFetcher(IN, OUT):
             # write each row to output file
             output.writerow(row)
 
-    print(f'After image-fetching: { procent * postCount }')
+    print(f'After image-fetching: { procent * postCount } %')
 
 # run function
 if __name__ == "__main__":
-    
     # Check if command line arguments follow program requirements
     if len(sys.argv) == 3:
         inputfile = sys.argv[1]
@@ -103,5 +102,5 @@ if __name__ == "__main__":
         outputfile = outputfile + '_export' + '.csv'
     else:
         sys.exit("ERROR. Did you make a mistake in the spelling")
-    
+    # run the function
     imgFetcher(inputfile, outputfile)
