@@ -23,6 +23,7 @@ def imgFetcher(IN, OUT):
 
     ITEMCOLUMN = 2
     IMGCOLUMN = 4
+    TYPECOLUMN = 5
 
     preCount = 0
     postCount = 0
@@ -42,12 +43,11 @@ def imgFetcher(IN, OUT):
                     preCount += 1
 
         procent = 100 / totalCount
-        print(f'Before image-fetching: { procent * preCount } %')
+        print(f'Before image-fetching: [ { procent * preCount } % ]\n')
 
     except FileNotFoundError:
         msg = f'ERROR: File <{IN}> not recognized'
         sys.exit(msg)
-
     # Makes requests to Discogs and writes the filtered link to the image of each row to file
     with open(OUT, 'w', newline='') as file:
         output = csv.writer(file, dialect='excel', delimiter=',')
@@ -59,6 +59,8 @@ def imgFetcher(IN, OUT):
                     # if length is not greater than 3, the field only contains ' - ' and is not useful
                     if len(request) > 3:
                         request = request.split(' ')
+                        if row[TYPECOLUMN] in ['CD', 'DVD', 'CASSETTE']:
+                            request.append(row[TYPECOLUMN])
                         request = '+'.join(request)
                         request = f'https://www.discogs.com/search/?q={request}&type=all'
 
@@ -71,27 +73,63 @@ def imgFetcher(IN, OUT):
                             pass
 
                         # Parsing HTML
-                        soup = BeautifulSoup(r, "html5lib")
+                        firstSoup = BeautifulSoup(r, "html5lib")
 
-                        span = soup.find('span', {'class': 'thumbnail_center'})
-                        if span != None:
+                        link2Pic = firstSoup.find('a', {'class': 'thumbnail_link'})
+                        if link2Pic != None:
+                            if link2Pic.has_attr('href') == True:
+                                href = link2Pic.attrs['href']
+                                href = f"https://www.discogs.com{href}"
 
-                            # check if there is an object here or if NoneType
-                            img = span.find('img')
-                            if img.has_attr('data-src') == True:
-                                src = img.attrs['data-src']
-                                row[IMGCOLUMN] = src
-                                postCount += 1
+                                r = requests.get(href)
+                                if r.status_code == 200:
+                                    r = r.text
+                                else:
+                                    pass
+
+                                secondSoup = BeautifulSoup(r, "html5lib")
+
+                                picture = secondSoup.find('picture')
+                                if picture != None:
+                                    img = picture.find('img')
+                                    if img != None:
+                                        if img.has_attr('src') == True:
+                                            row[IMGCOLUMN] = img.attrs['src']
+                                            print(row[IMGCOLUMN])
+                                            postCount += 1
+
+
+
+
+
+                        # span = firstSoup.find('span', {'class': 'thumbnail_center'})
+                        # if span != None:
+
+                        #     # check if there is an object here or if NoneType
+                        #     img = span.find('img')
+                        #     if img.has_attr('data-src') == True:
+                        #         src = img.attrs['data-src']
+                        #         row[IMGCOLUMN] = src
+                        #         postCount += 1
                 else:
                     postCount += 1
 
             # write each row to output file
             output.writerow(row)
 
-    print(f'After image-fetching: { procent * postCount } %')
+    print(f'After image-fetching: [{ procent * postCount } % ]')
 
 # run function
 if __name__ == "__main__":
+
+    print("""
+        ██╗███╗   ███╗ ██████╗ ███████╗███████╗████████╗ ██████╗██╗  ██╗███████╗██████╗ 
+        ██║████╗ ████║██╔════╝ ██╔════╝██╔════╝╚══██╔══╝██╔════╝██║  ██║██╔════╝██╔══██╗
+        ██║██╔████╔██║██║  ███╗█████╗  █████╗     ██║   ██║     ███████║█████╗  ██████╔╝
+        ██║██║╚██╔╝██║██║   ██║██╔══╝  ██╔══╝     ██║   ██║     ██╔══██║██╔══╝  ██╔══██╗
+        ██║██║ ╚═╝ ██║╚██████╔╝██║     ███████╗   ██║   ╚██████╗██║  ██║███████╗██║  ██║
+        ╚═╝╚═╝     ╚═╝ ╚═════╝ ╚═╝     ╚══════╝   ╚═╝    ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+    """)
     # Check if command line arguments follow program requirements
     if len(sys.argv) == 3:
         inputfile = sys.argv[1]
