@@ -17,8 +17,8 @@ from bs4 import BeautifulSoup
 
 def imgFetcher(IN, OUT):
     """
-    Opens a csv with specific data, uses data to format a HTTP request.
-    Fetches img links from "Discogs" and exports as csv.
+    Opens a .csv-file with specific data, uses data to format an HTTP request.
+    Fetches img links from "Discogs" and updates original .csv-file.
     """
 
     ITEMCOLUMN = 2
@@ -97,20 +97,6 @@ def imgFetcher(IN, OUT):
                                             row[IMGCOLUMN] = img.attrs['src']
                                             print(row[IMGCOLUMN])
                                             postCount += 1
-
-
-
-
-
-                        # span = firstSoup.find('span', {'class': 'thumbnail_center'})
-                        # if span != None:
-
-                        #     # check if there is an object here or if NoneType
-                        #     img = span.find('img')
-                        #     if img.has_attr('data-src') == True:
-                        #         src = img.attrs['data-src']
-                        #         row[IMGCOLUMN] = src
-                        #         postCount += 1
                 else:
                     postCount += 1
 
@@ -139,6 +125,6 @@ if __name__ == "__main__":
         outputfile = sys.argv[1].split('.')[0]
         outputfile = outputfile + '_export' + '.csv'
     else:
-        sys.exit("ERROR. Did you make a mistake in the spelling")
+        sys.exit("ERROR. Did you make a spelling mistake?")
     # run the function
     imgFetcher(inputfile, outputfile)
